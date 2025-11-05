@@ -1,0 +1,28 @@
+# Your Telegram Bot Token (get from @BotFather)
+BOT_TOKEN=your_bot_token_here
+
+# Admin username (without @)
+ADMIN_USERNAME=farda_j
+
+# ================================================================
+# NOWPayments Integration (Recommended for Instant Payments)
+# ================================================================
+# Get your API key from: https://nowpayments.io/
+# Sign up -> Dashboard -> API Keys -> Create New Key
+NOWPAYMENTS_API_KEY=your_nowpayments_api_key_here
+
+# ================================================================
+# Manual Crypto Wallet Addresses (Fallback/Alternative)
+# ================================================================
+# Only needed if NOT using NOWPayments
+# Generate these on: bitcoin.com, metamask.io, or similar services
+
+# Bitcoin wallet address (starts with bc1 or 1 or 3)
+BTC_WALLET_ADDRESS=bc1qyourbitcoinaddresshere
+
+# USDT TRC20 wallet address (starts with T) or ERC20 (starts with 0x)
+USDT_WALLET_ADDRESS=0xYourUSDTAddressHere
+
+# Ethereum wallet address (starts with 0x)
+ETH_WALLET_ADDRESS=0xYourEthereumAddressHere
+

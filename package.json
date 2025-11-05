@@ -1,0 +1,12 @@
+{
+  "name": "excelbot",
+  "version": "1.0.0",
+  "description": "Telegram bot for Excel store",
+  "scripts": {
+    "start": "python3 bot.py"
+  },
+  "engines": {
+    "python": "3.9"
+  }
+}
+
