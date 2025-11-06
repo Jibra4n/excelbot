@@ -21,16 +21,26 @@ USE_NOWPAYMENTS = bool(NOWPAYMENTS_API_KEY)  # Use NOWPayments if API key is set
 
 # Crypto wallet addresses (fallback for manual system)
 CRYPTO_WALLETS = {
-    "BTC": os.getenv("BTC_WALLET_ADDRESS", "bc1qyourbitcoinaddresshere"),
-    "USDT": os.getenv("USDT_WALLET_ADDRESS", "0xYourUSDTAddressHere"),
-    "ETH": os.getenv("ETH_WALLET_ADDRESS", "0xYourEthereumAddressHere")
+    "BTC": os.getenv("BTC_WALLET_ADDRESS", "bc1qppzf2d2dgqrmfy9hfam39waan5ewvg2vcdu9l3"),
+    "USDT": os.getenv("USDT_WALLET_ADDRESS", "0x9874Ff1F917627b8833e5f9551606cAd76d2127d"),
+    "ETH": os.getenv("LTC_WALLET_ADDRESS", "LffF1WifKLRQJB5GjYCRQCtoH7JyHr3b3f")
 }
 
 # Products for sale
 PRODUCTS = {
     "Apay (UK)": {"price": 0, "file": "products/onesheet.xlsx"},
-    "EE": {"price": 200, "file": "products/ecommerce_data.xlsx"},
-    "Argos": {"price": 100, "file": "products/business_us.xlsx"}
+    "EE": {"price": 200, "file": "products/onesheet.xlsx"},
+    "Argos Non-VBV Skip List": {"price": 100, "file": "products/onesheet.xlsx"},
+    "Waitrose (NON-VBV w Guide)": {"price": 150, "file": "products/onesheet.xlsx"},
+    "eBay Selling Chop": {"price": 120, "file": "products/onesheet.xlsx"},
+    "APPLE CHOP v3 (with Guide)": {"price": 250, "file": "products/onesheet.xlsx"},
+    "Food Skippers 🍔": {"price": 130, "file": "products/onesheet.xlsx"},
+    "Dev Chop 📱(with Guide n List)": {"price": 140, "file": "products/onesheet.xlsx"},
+    "Ultimate Clicking Guide and List": {"price": 180, "file": "products/onesheet.xlsx"},
+    "Barclays and HSBC Business Accounts": {"price": 160, "file": "products/onesheet.xlsx"},
+    "Harrods Business Accounts": {"price": 220, "file": "products/onesheet.xlsx"},
+    "Booking.com Guide with Fullz list": {"price": 170, "file": "products/onesheet.xlsx"},
+    "CC to BTC Fullz lists with Guide": {"price": 200, "file": "products/onesheet.xlsx"}
 }
 
 # Store balances (in production, use a database)
@@ -106,11 +116,11 @@ def get_available_cryptos() -> list:
         
         if response.status_code == 200:
             data = response.json()
-            return data.get("currencies", ["BTC", "ETH", "USDT"])
-        return ["BTC", "ETH", "USDT"]
+            return data.get("currencies", ["BTC", "LTC", "USDT"])
+        return ["BTC", "LTC", "USDT"]
     except Exception as e:
         print(f"NOWPayments currencies error: {e}")
-        return ["BTC", "ETH", "USDT"]
+        return ["BTC", "LTC", "USDT"]
 
 
 @dp.message_handler(commands=['start'])
@@ -138,7 +148,7 @@ async def start(message: types.Message):
 
 @dp.callback_query_handler(lambda c: c.data == "store")
 async def show_store(callback: types.CallbackQuery):
-    text = "🛒 *EXCEL Store*\n\nAvailable products:\n\n"
+    text = "🛒 *Kwasia's EXCEL Store*\n\nAvailable products:\n\n"
     keyboard = InlineKeyboardMarkup(row_width=1)
     
     for name, info in PRODUCTS.items():
@@ -195,7 +205,7 @@ async def show_wallet(callback: types.CallbackQuery):
         keyboard.add(
             InlineKeyboardButton("💰 Top Up with BTC", callback_data="topup_btc"),
             InlineKeyboardButton("💰 Top Up with USDT", callback_data="topup_usdt"),
-            InlineKeyboardButton("💰 Top Up with ETH", callback_data="topup_eth"),
+            InlineKeyboardButton("💰 Top Up with LTC", callback_data="topup_ltc"),
             InlineKeyboardButton("🔙 Back to Menu", callback_data="back_to_menu")
         )
     
@@ -235,7 +245,7 @@ async def back_to_menu(callback: types.CallbackQuery):
     )
 
     text = (
-        "Welcome to *EXCEL Store* 👋\n"
+        "Welcome to *Kwasia's EXCEL Store* 👋\n"
         "Use the menu below to interact with the bot 🤖\n"
         "===================\n"
         "Managed by [@farda_j](https://t.me/farda_j)\n"
@@ -564,7 +574,7 @@ async def handle_custom_amount(message: types.Message):
 def is_admin(message: types.Message):
     """Check if user is admin"""
     username = message.from_user.username or ""
-    return username.lower() == ADMIN_USERNAME.lower() or message.from_user.id in [123456789]  # Add your Telegram ID
+    return username.lower() == ADMIN_USERNAME.lower() or message.from_user.id in [5708297617]  # Add your Telegram ID
 
 
 @dp.message_handler(lambda m: m.text and m.text.startswith('/topup'))
