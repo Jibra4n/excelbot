@@ -1,7 +1,7 @@
 import asyncio
 import os
 from aiogram import Bot, Dispatcher, types
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InputFile
 from aiogram.utils import executor
 from dotenv import load_dotenv
 import requests
@@ -162,10 +162,10 @@ async def start(message: types.Message):
         for logo_path in logo_paths:
             if os.path.exists(logo_path):
                 try:
-                    with open(logo_path, 'rb') as photo:
-                        await message.answer_photo(photo=photo, caption=text, reply_markup=keyboard, parse_mode="Markdown")
-                        image_sent = True
-                        break
+                    photo = InputFile(logo_path)
+                    await message.answer_photo(photo=photo, caption=text, reply_markup=keyboard, parse_mode="Markdown")
+                    image_sent = True
+                    break
                 except Exception as e:
                     print(f"Error sending logo from file {logo_path}: {e}")
     
@@ -304,10 +304,10 @@ async def back_to_menu(callback: types.CallbackQuery):
                 try:
                     # Delete old message and send new one with photo
                     await callback.message.delete()
-                    with open(logo_path, 'rb') as photo:
-                        await bot.send_photo(chat_id=callback.message.chat.id, photo=photo, caption=text, reply_markup=keyboard, parse_mode="Markdown")
-                        image_sent = True
-                        break
+                    photo = InputFile(logo_path)
+                    await bot.send_photo(chat_id=callback.message.chat.id, photo=photo, caption=text, reply_markup=keyboard, parse_mode="Markdown")
+                    image_sent = True
+                    break
                 except Exception as e:
                     print(f"Error sending logo from file {logo_path}: {e}")
     
