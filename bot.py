@@ -144,7 +144,7 @@ async def start(message: types.Message):
     )
 
     # Try to send logo/banner image if it exists
-    logo_paths = ["logo.png", "banner.png", "logo.jpg", "banner.jpg", "logo.webp", "banner.webp"]
+    logo_names = ["logo.png", "banner.png", "logo.jpg", "banner.jpg", "logo.webp", "banner.webp"]
     logo_url = os.getenv("LOGO_URL", "")
     
     image_sent = False
@@ -157,14 +157,26 @@ async def start(message: types.Message):
         except Exception as e:
             print(f"Error sending logo from URL: {e}")
     
-    # Try local files if URL didn't work
+    # Try local files if URL didn't work - check multiple possible locations
     if not image_sent:
-        for logo_path in logo_paths:
-            if os.path.exists(logo_path):
+        # Get current working directory and check multiple paths
+        cwd = os.getcwd()
+        possible_paths = []
+        for logo_name in logo_names:
+            # Check in current directory
+            possible_paths.append(logo_name)
+            # Check with absolute path from current directory
+            possible_paths.append(os.path.join(cwd, logo_name))
+            # Check in root (for Railway deployments)
+            possible_paths.append(os.path.join("/", logo_name))
+        
+        for logo_path in possible_paths:
+            if os.path.exists(logo_path) and os.path.isfile(logo_path):
                 try:
                     photo = InputFile(logo_path)
                     await message.answer_photo(photo=photo, caption=text, reply_markup=keyboard, parse_mode="Markdown")
                     image_sent = True
+                    print(f"Successfully sent logo from: {logo_path}")
                     break
                 except Exception as e:
                     print(f"Error sending logo from file {logo_path}: {e}")
@@ -282,7 +294,7 @@ async def back_to_menu(callback: types.CallbackQuery):
     )
 
     # Try to send logo/banner image if it exists
-    logo_paths = ["logo.png", "banner.png", "logo.jpg", "banner.jpg", "logo.webp", "banner.webp"]
+    logo_names = ["logo.png", "banner.png", "logo.jpg", "banner.jpg", "logo.webp", "banner.webp"]
     logo_url = os.getenv("LOGO_URL", "")
     
     image_sent = False
@@ -297,16 +309,28 @@ async def back_to_menu(callback: types.CallbackQuery):
         except Exception as e:
             print(f"Error sending logo from URL: {e}")
     
-    # Try local files if URL didn't work
+    # Try local files if URL didn't work - check multiple possible locations
     if not image_sent:
-        for logo_path in logo_paths:
-            if os.path.exists(logo_path):
+        # Get current working directory and check multiple paths
+        cwd = os.getcwd()
+        possible_paths = []
+        for logo_name in logo_names:
+            # Check in current directory
+            possible_paths.append(logo_name)
+            # Check with absolute path from current directory
+            possible_paths.append(os.path.join(cwd, logo_name))
+            # Check in root (for Railway deployments)
+            possible_paths.append(os.path.join("/", logo_name))
+        
+        for logo_path in possible_paths:
+            if os.path.exists(logo_path) and os.path.isfile(logo_path):
                 try:
                     # Delete old message and send new one with photo
                     await callback.message.delete()
                     photo = InputFile(logo_path)
                     await bot.send_photo(chat_id=callback.message.chat.id, photo=photo, caption=text, reply_markup=keyboard, parse_mode="Markdown")
                     image_sent = True
+                    print(f"Successfully sent logo from: {logo_path}")
                     break
                 except Exception as e:
                     print(f"Error sending logo from file {logo_path}: {e}")
