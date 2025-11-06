@@ -23,12 +23,12 @@ USE_NOWPAYMENTS = bool(NOWPAYMENTS_API_KEY)  # Use NOWPayments if API key is set
 CRYPTO_WALLETS = {
     "BTC": os.getenv("BTC_WALLET_ADDRESS", "bc1qppzf2d2dgqrmfy9hfam39waan5ewvg2vcdu9l3"),
     "USDT": os.getenv("USDT_WALLET_ADDRESS", "0x9874Ff1F917627b8833e5f9551606cAd76d2127d"),
-    "ETH": os.getenv("LTC_WALLET_ADDRESS", "LffF1WifKLRQJB5GjYCRQCtoH7JyHr3b3f")
+    "LTC": os.getenv("LTC_WALLET_ADDRESS", "LffF1WifKLRQJB5GjYCRQCtoH7JyHr3b3f")
 }
 
 # Products for sale
 PRODUCTS = {
-    "Apay (UK)": {"price": 0, "file": "products/onesheet.xlsx"},
+    "Apay (UK)": {"price": 200, "file": "products/onesheet.xlsx"},
     "EE": {"price": 200, "file": "products/onesheet.xlsx"},
     "Argos Non-VBV Skip List": {"price": 100, "file": "products/onesheet.xlsx"},
     "Waitrose (NON-VBV w Guide)": {"price": 150, "file": "products/onesheet.xlsx"},
@@ -143,7 +143,35 @@ async def start(message: types.Message):
         "`052f3ce5ab90550f27defd79cc6355b57af414ab414cd704460a55281c75b9661`"
     )
 
-    await message.answer(text, reply_markup=keyboard, parse_mode="Markdown")
+    # Try to send logo/banner image if it exists
+    logo_paths = ["logo.png", "banner.png", "logo.jpg", "banner.jpg", "logo.webp", "banner.webp"]
+    logo_url = os.getenv("LOGO_URL", "")
+    
+    image_sent = False
+    
+    # Try URL first if configured
+    if logo_url:
+        try:
+            await message.answer_photo(photo=logo_url, caption=text, reply_markup=keyboard, parse_mode="Markdown")
+            image_sent = True
+        except Exception as e:
+            print(f"Error sending logo from URL: {e}")
+    
+    # Try local files if URL didn't work
+    if not image_sent:
+        for logo_path in logo_paths:
+            if os.path.exists(logo_path):
+                try:
+                    with open(logo_path, 'rb') as photo:
+                        await message.answer_photo(photo=photo, caption=text, reply_markup=keyboard, parse_mode="Markdown")
+                        image_sent = True
+                        break
+                except Exception as e:
+                    print(f"Error sending logo from file {logo_path}: {e}")
+    
+    # Fallback to text-only if no image found
+    if not image_sent:
+        await message.answer(text, reply_markup=keyboard, parse_mode="Markdown")
 
 
 @dp.callback_query_handler(lambda c: c.data == "store")
@@ -253,7 +281,40 @@ async def back_to_menu(callback: types.CallbackQuery):
         "`052f3ce5ab90550f27defd79cc6355b57af414ab414cd704460a55281c75b9661`"
     )
 
-    await callback.message.edit_text(text, reply_markup=keyboard, parse_mode="Markdown")
+    # Try to send logo/banner image if it exists
+    logo_paths = ["logo.png", "banner.png", "logo.jpg", "banner.jpg", "logo.webp", "banner.webp"]
+    logo_url = os.getenv("LOGO_URL", "")
+    
+    image_sent = False
+    
+    # Try URL first if configured
+    if logo_url:
+        try:
+            # Delete old message and send new one with photo
+            await callback.message.delete()
+            await bot.send_photo(chat_id=callback.message.chat.id, photo=logo_url, caption=text, reply_markup=keyboard, parse_mode="Markdown")
+            image_sent = True
+        except Exception as e:
+            print(f"Error sending logo from URL: {e}")
+    
+    # Try local files if URL didn't work
+    if not image_sent:
+        for logo_path in logo_paths:
+            if os.path.exists(logo_path):
+                try:
+                    # Delete old message and send new one with photo
+                    await callback.message.delete()
+                    with open(logo_path, 'rb') as photo:
+                        await bot.send_photo(chat_id=callback.message.chat.id, photo=photo, caption=text, reply_markup=keyboard, parse_mode="Markdown")
+                        image_sent = True
+                        break
+                except Exception as e:
+                    print(f"Error sending logo from file {logo_path}: {e}")
+    
+    # Fallback to text-only if no image found
+    if not image_sent:
+        await callback.message.edit_text(text, reply_markup=keyboard, parse_mode="Markdown")
+    
     await callback.answer()
 
 
